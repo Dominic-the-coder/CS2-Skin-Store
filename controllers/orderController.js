@@ -43,6 +43,7 @@ exports.createOrder = async (req, res) => {
 
         const session = await stripe.checkout.sessions.create({
             success_url: `http://localhost:3000/orders/success/${order.id}`,
+            cancel_url: `http://localhost:3000/orders/cancel/${order.id}`,
             line_items: lineItems,
             mode: 'payment',
             metadata: {
@@ -82,7 +83,21 @@ exports.paymentSuccess = async (req, res) => {
     await order.update({ status: "paid" })
 
     res.json(order);
-}
+};
+
+exports.paymentCancel = async (req, res) => {
+    const orderId = req.params.order_id;
+
+    const order = await Order.findOne({
+        where: {
+            id: orderId
+        }
+    })
+
+    await order.update({status: "cancelled"})
+
+    res.json(order)
+};
 
 exports.getMyOrders = async (req, res) => {
     try {

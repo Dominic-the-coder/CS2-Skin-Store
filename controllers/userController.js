@@ -35,6 +35,10 @@ exports.loginUser = async (req, res) => {
 
 exports.getAllUsers = async (req, res) => {
     try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: "Forbidden" });
+        }
+
         const users = await User.findAll();
         res.json(users);
     } catch (err) {
